@@ -3,10 +3,12 @@
 #include "MAVLinkEndpoint.h"
 #include "transmitters/MAVLinkTXCallback.h"
 
+class MAVLinkEndpoint;
+
 // Generate outgoing heartbeat packets
-class MAVHeartbeatTX : public MAVLinkTXCallback {
+class MAVLinkHeartbeatTX : public MAVLinkTXCallback {
 public:
-    MAVHeartbeatTX(MAVLinkEndpoint *mav, uint8_t vehicle, uint8_t autopilot,
+    MAVLinkHeartbeatTX(MAVLinkEndpoint *mav, uint8_t vehicle, uint8_t autopilot,
         uint8_t sysmode, uint32_t custmode, uint8_t sysstate, uint32_t interval = 1000) :
         MAVLinkTXCallback(interval, "heartbeat", mav), mVehicle(vehicle),
         mAutopilot(autopilot), mSystemMode(sysmode), mCustomMode(custmode), 

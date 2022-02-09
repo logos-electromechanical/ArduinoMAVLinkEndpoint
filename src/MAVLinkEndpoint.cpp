@@ -66,14 +66,14 @@ bool MAVLinkEndpoint::registerDebugPrint(Print *p)
 bool MAVLinkEndpoint::process(uint8_t c)
 {
     bool rcvd = false;
-    if (mavlink_parse_char(MAVLINK_COMM_0, c, &msg, &stat))
+    if (mavlink_parse_char(MAVLINK_COMM_0, c, &mMessage, &mStatus))
     {
         if (mDebugPrint) mDebugPrint->println("Packet received!");
         bool result = false;
         rcvd = true;
         for (uint8_t i = 0; i < mRXCallbackCount; i++) 
         {
-            result |= mRXCallbacks[i]->process(&mMessage, &mStatus));
+            result |= mRXCallbacks[i]->process(&mMessage, &mStatus);
         }
         if (!result && (mRXDefaultCallback != nullptr)) 
         {
@@ -91,9 +91,9 @@ bool MAVLinkEndpoint::process(uint8_t c)
 bool MAVLinkEndpoint::process(uint8_t *data, size_t len)
 {
     bool rcvd = false;
-    for (int i = 0; i < len; i++) 
+    for (uint16_t i = 0; i < len; i++) 
     {
-        rcvd |= mavlink_parse_char(MAVLINK_COMM_0, data[i], &mMessage, &mStatus);
+        rcvd |= this->process(data[i]);
     }
     return rcvd;
 }
@@ -149,7 +149,7 @@ bool MAVLinkEndpoint::poll()
     bool rcvd = false;
     while (mInputStream->available())       // While there are bytes available in the input stream...
     {
-        uint8_t c = mInputStream->read()    // Read in a byte
+        uint8_t c = mInputStream->read();   // Read in a byte
         rcvd |= process(c);                 // process the byte and if there's a packet, set the return value true
     }
     return rcvd;

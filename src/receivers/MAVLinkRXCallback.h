@@ -1,7 +1,8 @@
 #pragma once
 
 #include "MAVLinkEndpoint.h"
-#include "receivers/MAVLinkRXCallback.h"
+
+class MAVLinkEndpoint;
 
 class MAVLinkRXCallback
 {
@@ -9,6 +10,7 @@ public:
     MAVLinkRXCallback() = delete;
     MAVLinkRXCallback(uint32_t timeout, String name, MAVLinkEndpoint *e):
         mRXName(name), mRXEndpoint(e), mLastRX(0), mTimeout(timeout) {};
+    virtual ~MAVLinkRXCallback() {};
     virtual bool process(mavlink_message_t *msg, mavlink_status_t *stat) = 0;
     virtual void timeout(uint64_t t) = 0;
     virtual bool isTimeout(uint64_t t);

@@ -3,10 +3,7 @@
 #include <Arduino.h>
 #include "mavlink/ardupilotmega/mavlink.h"
 #include "receivers/MAVLinkRXCallback.h"
-#include "receivers/MAVLinkHeartbeatRX.h"
-#include "receivers/MAVLinkDefaultDeactivateRX.h"
 #include "transmitters/MAVLinkTXCallback.h"
-#include "transmitters/MAVLinkHeartbeatTX.h"
 
 #ifndef MAVLINK_RX_MAX_HANDLER_COUNT
     #define MAVLINK_RX_MAX_HANDLER_COUNT    (32)
@@ -15,31 +12,32 @@
     #define MAVLINK_TX_MAX_HANDLER_COUNT    (32)
 #endif // MAVLINK_RX_MAX_HANDLER_COUNT
 
-class MAVLinkEndpoint;  // forward declaration for the typedefs
+class MAVLinkRXCallback;    // forward declared so we can declare pointers to it
+class MAVLinkTXCallback;    // forward declared so we can declare pointers to it
 
 typedef size_t (*MAVlinkTXWriter_t)(uint8_t *data, size_t len);             // Function to write out a packet
 
 class MAVLinkEndpoint
 {
 public:
-    virtual MAVLinkEndpoint(uint8_t compid, uint8_t sysid):
-        mComponentID(compid), mSystemID(sysid), mRXDefault(nullptr),
+    MAVLinkEndpoint(uint8_t compid, uint8_t sysid):
+        mComponentID(compid), mSystemID(sysid), mRXDefaultCallback(nullptr),
         mWriter(nullptr), mInputStream(nullptr), mOutputPrint(nullptr), 
         mRXCallbackCount(0), mTXCallbackCount(0) {};
-    virtual MAVLinkEndpoint(uint8_t compid, uint8_t sysid, MAVlinkTXWriter_t w):
-        mComponentID(compid), mSystemID(sysid), mRXDefault(nullptr),
+    MAVLinkEndpoint(uint8_t compid, uint8_t sysid, MAVlinkTXWriter_t w):
+        mComponentID(compid), mSystemID(sysid), mRXDefaultCallback(nullptr),
         mWriter(w), mInputStream(nullptr), mOutputPrint(nullptr), 
         mRXCallbackCount(0), mTXCallbackCount(0) {};
-    virtual MAVLinkEndpoint(uint8_t compid, uint8_t sysid, Stream *s):
-        mComponentID(compid), mSystemID(sysid), mRXDefault(nullptr),
+    MAVLinkEndpoint(uint8_t compid, uint8_t sysid, Stream *s):
+        mComponentID(compid), mSystemID(sysid), mRXDefaultCallback(nullptr),
         mWriter(nullptr), mInputStream(s), mOutputPrint(nullptr), 
         mRXCallbackCount(0), mTXCallbackCount(0) {};
-    virtual MAVLinkEndpoint(uint8_t compid, uint8_t sysid, Print *p):
-        mComponentID(compid), mSystemID(sysid), mRXDefault(nullptr),
+    MAVLinkEndpoint(uint8_t compid, uint8_t sysid, Print *p):
+        mComponentID(compid), mSystemID(sysid), mRXDefaultCallback(nullptr),
         mWriter(nullptr), mInputStream(nullptr), mOutputPrint(p), 
         mRXCallbackCount(0), mTXCallbackCount(0) {};
-    virtual MAVLinkEndpoint(uint8_t compid, uint8_t sysid, Stream *s, Print *p):
-        mComponentID(compid), mSystemID(sysid), mRXDefault(nullptr),
+    MAVLinkEndpoint(uint8_t compid, uint8_t sysid, Stream *s, Print *p):
+        mComponentID(compid), mSystemID(sysid), mRXDefaultCallback(nullptr),
         mWriter(nullptr), mInputStream(s), mOutputPrint(p), 
         mRXCallbackCount(0), mTXCallbackCount(0) {};
     virtual ~MAVLinkEndpoint() {};
