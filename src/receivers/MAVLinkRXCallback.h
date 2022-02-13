@@ -9,7 +9,9 @@ class MAVLinkRXCallback
 public:
     MAVLinkRXCallback() = delete;
     MAVLinkRXCallback(uint32_t timeout, String name, MAVLinkEndpoint *e):
-        mRXName(name), mRXEndpoint(e), mLastRX(0), mTimeout(timeout) {};
+        mRXName(name), mRXEndpoint(e), mLastRX(0), mTimeout(timeout), mInterval(1000000) {};
+    MAVLinkRXCallback(uint32_t timeout, uint32_t interval, String name, MAVLinkEndpoint *e):
+        mRXName(name), mRXEndpoint(e), mLastRX(0), mTimeout(timeout), mInterval(interval) {};
     virtual ~MAVLinkRXCallback() {};
     virtual bool process(mavlink_message_t *msg, mavlink_status_t *stat) = 0;
     virtual void timeout(uint64_t t) = 0;
@@ -21,4 +23,5 @@ protected:
     MAVLinkEndpoint         *mRXEndpoint;
     uint64_t                mLastRX;
     const uint32_t          mTimeout;
+    const uint32_t          mInterval;
 };

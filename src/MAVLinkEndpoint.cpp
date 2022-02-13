@@ -68,7 +68,12 @@ bool MAVLinkEndpoint::process(uint8_t c)
     bool rcvd = false;
     if (mavlink_parse_char(MAVLINK_COMM_0, c, &mMessage, &mStatus))
     {
-        if (mDebugPrint) mDebugPrint->println("Packet received!");
+        if (mDebugPrint) 
+        {
+            mDebugPrint->println("Packet received!");
+            mDebugPrint->print("Message type: ");
+            mDebugPrint->println(mMessage.msgid);
+            mDebugPrint->println(millis());
         bool result = false;
         rcvd = true;
         for (uint8_t i = 0; i < mRXCallbackCount; i++) 
@@ -82,7 +87,8 @@ bool MAVLinkEndpoint::process(uint8_t c)
     }
     if (mDebugPrint && mStatus.parse_state == 14) 
     {
-        mDebugPrint->println("\n\nReceived bad CRC\n");
+        mDebugPrint->print("\nReceived bad CRC ");
+        mDebugPrint->println(millis());
     }
     this->tick();
     return rcvd;
