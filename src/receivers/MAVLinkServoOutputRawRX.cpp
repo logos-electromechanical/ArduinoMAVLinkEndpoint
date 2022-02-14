@@ -83,21 +83,21 @@ void MAVLinkServoOutputRawRX::timeout(uint64_t t)
 
 void MAVLinkServoOutputRawRX::registerTimeCallback
 (
-    MAVLinkRXNotifiable<uint32_t> *cb
+    MAVLinkNotifiable<uint32_t> *cb
 ) {
     if (cb) mTimeNotifier = cb;
 }
 
 void MAVLinkServoOutputRawRX::registerPortCallback
 (
-    MAVLinkRXNotifiable<uint8_t> *cb
+    MAVLinkNotifiable<uint8_t> *cb
 ) {
     if (cb) mPortNotifier = cb;
 }
 
 bool MAVLinkServoOutputRawRX::registerServoCallback
 (
-    MAVLinkRXNotifiable<uint16_t> *cb, 
+    MAVLinkNotifiable<uint16_t> *cb, 
     const String name, 
     uint8_t servoChannel
 ) {

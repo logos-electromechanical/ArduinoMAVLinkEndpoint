@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "MAVLinkEndpoint.h"
 #include "params/MAVLinkParamListener.h"
-#include "params/MAVLinkParamNotifiable.h"
+#include "util/MAVLinkNotifiable.h"
 
 const uint8_t mavLinkParamLen   = 17;
 const uint8_t maxNumParams      = 16;
@@ -24,8 +24,8 @@ public:
     virtual uint8_t getParamCount() { return mParamCount; };   
     virtual bool setParam(const char *name, const mavlink_param_union_t *val);
     virtual bool setParam(const uint8_t idx, const mavlink_param_union_t *val);
-    virtual bool registerNotifier(const char *name, MAVLinkParamNotifiable *p);
-    virtual bool registerNotifier(MAVLinkParamNotifiable *p);
+    virtual bool registerNotifier(const char *name, MAVLinkNotifiable<mavlink_param_union_t> *p);
+    virtual bool registerNotifier(MAVLinkNotifiable<mavlink_param_union_t> *p);
     virtual void transmitParam(const char* name);
     virtual void transmitParam(const uint8_t idx);
     virtual void transmitParamList();
@@ -39,7 +39,7 @@ private:
     } paramElementStruct;
 
     paramElementStruct      mParams[maxNumParams];
-    MAVLinkParamNotifiable  *mNotifiers[maxNumNotifiers];
+    MAVLinkNotifiable<mavlink_param_union_t>  *mNotifiers[maxNumNotifiers];
     uint32_t                mTransmitDelayMS;
     uint8_t                 mParamCount;
     uint8_t                 mNotifierCount;

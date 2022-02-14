@@ -74,6 +74,7 @@ bool MAVLinkEndpoint::process(uint8_t c)
             mDebugPrint->print("Message type: ");
             mDebugPrint->println(mMessage.msgid);
             mDebugPrint->println(millis());
+        }
         bool result = false;
         rcvd = true;
         for (uint8_t i = 0; i < mRXCallbackCount; i++) 
