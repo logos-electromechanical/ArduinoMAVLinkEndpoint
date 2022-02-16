@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 #include "MockPrint.h"
-#include "String.h"
+#include "WString.h"
 
 
 enum LookaheadMode{

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstring>
 #include "Arduino.h"
 #include "mavlink/ardupilotmega/mavlink.h"
 #include "receivers/MAVLinkRXCallback.h"

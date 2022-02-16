@@ -1,21 +1,20 @@
 
 cmake_minimum_required(VERSION 3.10)
 
-project(mavlink_arduino_test)
+project(mavlink_arduino_test LANGUAGES CXX)
 enable_testing()
 
-# specify the C++ standard
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+# # specify the C++ standard
+# set(CMAKE_CXX_STANDARD 11)
+# set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-message(WARNING "${mavlink_arduino_test_SOURCE_DIR}")
 set(SOURCE_HOME_DIR ${mavlink_arduino_test_SOURCE_DIR}/../src)
-message(WARNING "${SOURCE_HOME_DIR}")
 
 find_package(GTest REQUIRED)
+include(GoogleTest)
 
 set (SRCS 
-    ${mavlink_arduino_test_SOURCE_DIR}/String.cpp
+    ${mavlink_arduino_test_SOURCE_DIR}/WString.cpp
     ${SOURCE_HOME_DIR}/MAVLinkEndpoint.cpp
     ${SOURCE_HOME_DIR}/receivers/MAVLinkDefaultDeactivateRX.cpp
     ${SOURCE_HOME_DIR}/receivers/MAVLinkHeartbeatRX.cpp
@@ -27,10 +26,11 @@ set (SRCS
 
 add_executable(mavlink_arduino_test mavlink_test.cpp ${SRCS})
 
-include_directories(AFTER /usr/include ${SOURCE_HOME_DIR} ${mavlink_arduino_test_SOURCE_DIR})
+include_directories(AFTER ${SOURCE_HOME_DIR} ${mavlink_arduino_test_SOURCE_DIR})
 
-message(WARNING "${INCLUDE_DIRECTORIES}")
-
-target_link_libraries(mavlink_arduino_test gtest_main)
+target_link_libraries(mavlink_arduino_test gtest_main gtest pthread)
 
 gtest_add_tests(TARGET mavlink_arduino_test SOURCES ${SRCS})
+
+add_custom_target(mavlink_arduino_tests_exec ALL 
+                COMMAND mavlink_arduino_test)
