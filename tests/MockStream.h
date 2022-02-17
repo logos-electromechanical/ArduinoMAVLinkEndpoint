@@ -1,5 +1,6 @@
 #pragma once 
 
+#include <gmock/gmock.h>
 #include <stdint.h>
 #include "MockPrint.h"
 #include "WString.h"
@@ -15,79 +16,103 @@ enum LookaheadMode{
 
 class Stream : public Print
 {
-  protected:
+protected:
     unsigned long _timeout;      // number of milliseconds to wait for the next char before aborting timed read
     unsigned long _startMillis;  // used for timeout measurement
     int timedRead();    // read stream with timeout
     int timedPeek();    // peek stream with timeout
     int peekNextDigit(LookaheadMode lookahead, bool detectDecimal); // returns the next numeric digit in the stream or -1 if timeout
 
-  public:
+public:
     virtual int available() = 0;
     virtual int read() = 0;
     virtual int peek() = 0;
 
     Stream() {_timeout=1000;}
 
-// parsing methods
+    // parsing methods
 
-  virtual void setTimeout(unsigned long timeout);  // sets maximum milliseconds to wait for stream data, default is 1 second
-  virtual unsigned long getTimeout(void) { return _timeout; }
-  
-  virtual bool find(char *target);   // reads data from the stream until the target string is found
-  virtual bool find(uint8_t *target) { return find ((char *)target); }
-  // returns true if target string is found, false if timed out (see setTimeout)
+    virtual void setTimeout(unsigned long timeout);  // sets maximum milliseconds to wait for stream data, default is 1 second
+    virtual unsigned long getTimeout(void) { return _timeout; }
+    
+    virtual bool find(char *target);   // reads data from the stream until the target string is found
+    virtual bool find(uint8_t *target) { return find ((char *)target); }
+    // returns true if target string is found, false if timed out (see setTimeout)
 
-  virtual bool find(char *target, size_t length);   // reads data from the stream until the target string of given length is found
-  virtual bool find(uint8_t *target, size_t length) { return find ((char *)target, length); }
-  // returns true if target string is found, false if timed out
+    virtual bool find(char *target, size_t length);   // reads data from the stream until the target string of given length is found
+    virtual bool find(uint8_t *target, size_t length) { return find ((char *)target, length); }
+    // returns true if target string is found, false if timed out
 
-  virtual bool find(char target) { return find (&target, 1); }
+    virtual bool find(char target) { return find (&target, 1); }
 
-  virtual bool findUntil(char *target, char *terminator);   // as find but search ends if the terminator string is found
-  virtual bool findUntil(uint8_t *target, char *terminator) { return findUntil((char *)target, terminator); }
+    virtual bool findUntil(char *target, char *terminator);   // as find but search ends if the terminator string is found
+    virtual bool findUntil(uint8_t *target, char *terminator) { return findUntil((char *)target, terminator); }
 
-  virtual bool findUntil(char *target, size_t targetLen, char *terminate, size_t termLen);   // as above but search ends if the terminate string is found
-  virtual bool findUntil(uint8_t *target, size_t targetLen, char *terminate, size_t termLen) {return findUntil((char *)target, targetLen, terminate, termLen); }
+    virtual bool findUntil(char *target, size_t targetLen, char *terminate, size_t termLen);   // as above but search ends if the terminate string is found
+    virtual bool findUntil(uint8_t *target, size_t targetLen, char *terminate, size_t termLen) {return findUntil((char *)target, targetLen, terminate, termLen); }
 
-  virtual long parseInt(LookaheadMode lookahead = SKIP_ALL, char ignore = NO_IGNORE_CHAR);
-  // returns the first valid (long) integer value from the current position.
-  // lookahead determines how parseInt looks ahead in the stream.
-  // See LookaheadMode enumeration at the top of the file.
-  // Lookahead is terminated by the first character that is not a valid part of an integer.
-  // Once parsing commences, 'ignore' will be skipped in the stream.
+    virtual long parseInt(LookaheadMode lookahead = SKIP_ALL, char ignore = NO_IGNORE_CHAR);
+    // returns the first valid (long) integer value from the current position.
+    // lookahead determines how parseInt looks ahead in the stream.
+    // See LookaheadMode enumeration at the top of the file.
+    // Lookahead is terminated by the first character that is not a valid part of an integer.
+    // Once parsing commences, 'ignore' will be skipped in the stream.
 
-  virtual float parseFloat(LookaheadMode lookahead = SKIP_ALL, char ignore = NO_IGNORE_CHAR);
-  // float version of parseInt
+    virtual float parseFloat(LookaheadMode lookahead = SKIP_ALL, char ignore = NO_IGNORE_CHAR);
+    // float version of parseInt
 
-  virtual size_t readBytes( char *buffer, size_t length); // read chars from stream into buffer
-  virtual size_t readBytes( uint8_t *buffer, size_t length) { return readBytes((char *)buffer, length); }
-  // terminates if length characters have been read or timeout (see setTimeout)
-  // returns the number of characters placed in the buffer (0 means no valid data found)
+    virtual size_t readBytes( char *buffer, size_t length); // read chars from stream into buffer
+    virtual size_t readBytes( uint8_t *buffer, size_t length) { return readBytes((char *)buffer, length); }
+    // terminates if length characters have been read or timeout (see setTimeout)
+    // returns the number of characters placed in the buffer (0 means no valid data found)
 
-  virtual size_t readBytesUntil( char terminator, char *buffer, size_t length); // as readBytes with terminator character
-  virtual size_t readBytesUntil( char terminator, uint8_t *buffer, size_t length) { return readBytesUntil(terminator, (char *)buffer, length); }
-  // terminates if length characters have been read, timeout, or if the terminator character  detected
-  // returns the number of characters placed in the buffer (0 means no valid data found)
+    virtual size_t readBytesUntil( char terminator, char *buffer, size_t length); // as readBytes with terminator character
+    virtual size_t readBytesUntil( char terminator, uint8_t *buffer, size_t length) { return readBytesUntil(terminator, (char *)buffer, length); }
+    // terminates if length characters have been read, timeout, or if the terminator character  detected
+    // returns the number of characters placed in the buffer (0 means no valid data found)
 
-  // Arduino String functions to be added here
-  virtual String readString();
-  virtual String readStringUntil(char terminator);
+    // Arduino String functions to be added here
+    virtual String readString();
+    virtual String readStringUntil(char terminator);
 
-  protected:
-  virtual long parseInt(char ignore) { return parseInt(SKIP_ALL, ignore); }
-  virtual float parseFloat(char ignore) { return parseFloat(SKIP_ALL, ignore); }
-  // These overload exists for compatibility with any class that has derived
-  // Stream and used parseFloat/Int with a custom ignore character. To keep
-  // the public API simple, these overload remains protected.
+    protected:
+    virtual long parseInt(char ignore) { return parseInt(SKIP_ALL, ignore); }
+    virtual float parseFloat(char ignore) { return parseFloat(SKIP_ALL, ignore); }
+    // These overload exists for compatibility with any class that has derived
+    // Stream and used parseFloat/Int with a custom ignore character. To keep
+    // the public API simple, these overload remains protected.
 
-  struct MultiTarget {
-    const char *str;  // string you're searching for
-    size_t len;       // length of string you're searching for
-    size_t index;     // index used by the search routine.
-  };
+    struct MultiTarget {
+        const char *str;  // string you're searching for
+        size_t len;       // length of string you're searching for
+        size_t index;     // index used by the search routine.
+    };
 
-  // This allows you to search for an arbitrary number of strings.
-  // Returns index of the target that is found first or -1 if timeout occurs.
-  virtual int findMulti(struct MultiTarget *targets, int tCount);
+    // This allows you to search for an arbitrary number of strings.
+    // Returns index of the target that is found first or -1 if timeout occurs.
+    virtual int findMulti(struct MultiTarget *targets, int tCount);
+};
+
+class MockStream : public Stream
+{
+    long parseInt() { return parseInt (SKIP_ALL, NO_IGNORE_CHAR); }
+    long parseInt(LookaheadMode l) { return parseInt (l, NO_IGNORE_CHAR); }
+    float parseFloat() { return parseInt (SKIP_ALL, NO_IGNORE_CHAR); }
+    float parseFloat(LookaheadMode l) { return parseInt (l, NO_IGNORE_CHAR); }
+    MOCK_METHOD(int, available, (), (override));
+    MOCK_METHOD(int, read, (), (override));
+    MOCK_METHOD(int, peek, (), (override));
+    MOCK_METHOD(void, setTimeout, (unsigned long t), (override));
+    MOCK_METHOD(unsigned long, getTimeout, (), (override));
+    MOCK_METHOD(bool, find, (char *t), (override));
+    MOCK_METHOD(bool, find, (char *t, size_t len), (override));
+    MOCK_METHOD(bool, findUntil, (char *t, char *term), (override));
+    MOCK_METHOD(bool, findUntil, (char *t, size_t tlen, char *term, size_t termlen), (override));
+    MOCK_METHOD(long, parseInt, (LookaheadMode l, char i), (override));
+    MOCK_METHOD(float, parseFloat, (LookaheadMode l, char i), (override));
+    MOCK_METHOD(size_t, readBytes, (char *buf, size_t len), (override));
+    MOCK_METHOD(size_t, readBytesUntil, (char terminator, char *buf, size_t len), (override));
+    MOCK_METHOD(String, readString, (), (override));
+    MOCK_METHOD(String, readStringUntil, (char terminator), (override));
+    MOCK_METHOD(size_t, write, (uint8_t), (override));
 };

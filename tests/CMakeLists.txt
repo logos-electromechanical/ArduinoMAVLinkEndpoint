@@ -4,9 +4,13 @@ cmake_minimum_required(VERSION 3.10)
 project(mavlink_arduino_test LANGUAGES CXX)
 enable_testing()
 
-# # specify the C++ standard
-# set(CMAKE_CXX_STANDARD 11)
-# set(CMAKE_CXX_STANDARD_REQUIRED True)
+# specify the C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# Time for flags
+# This flag is required to prevent compiler whining about mavlink
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -Wno-address-of-packed-member)
 
 set(SOURCE_HOME_DIR ${mavlink_arduino_test_SOURCE_DIR}/../src)
 

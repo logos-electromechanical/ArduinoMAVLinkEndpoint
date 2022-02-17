@@ -97,6 +97,7 @@ bool MAVLinkEndpoint::process(uint8_t c)
 
 bool MAVLinkEndpoint::process(uint8_t *data, size_t len)
 {
+    if (data == nullptr) { return false; }
     bool rcvd = false;
     for (uint16_t i = 0; i < len; i++) 
     {
@@ -107,6 +108,7 @@ bool MAVLinkEndpoint::process(uint8_t *data, size_t len)
 
 size_t MAVLinkEndpoint::transmit(mavlink_message_t *msg_ptr)
 {
+    if (msg_ptr == nullptr) { return 0; }
     uint8_t buf[MAVLINK_MAX_PACKET_LEN];                        // allocate an outbound buffer
     uint16_t len = mavlink_msg_to_send_buffer(buf, msg_ptr);    // pack the outbound message up into a buffer
     if (mWriter)                                                // if we've registered a writer function, call it and return the number of characters written

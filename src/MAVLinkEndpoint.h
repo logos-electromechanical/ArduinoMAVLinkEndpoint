@@ -24,23 +24,27 @@ public:
     MAVLinkEndpoint(uint8_t compid, uint8_t sysid):
         mComponentID(compid), mSystemID(sysid), mRXDefaultCallback(nullptr),
         mWriter(nullptr), mInputStream(nullptr), mOutputPrint(nullptr), 
-        mRXCallbackCount(0), mTXCallbackCount(0) {};
+        mDebugPrint(nullptr), mRXCallbackCount(0), mTXCallbackCount(0) {};
     MAVLinkEndpoint(uint8_t compid, uint8_t sysid, MAVlinkTXWriter_t w):
         mComponentID(compid), mSystemID(sysid), mRXDefaultCallback(nullptr),
         mWriter(w), mInputStream(nullptr), mOutputPrint(nullptr), 
-        mRXCallbackCount(0), mTXCallbackCount(0) {};
+        mDebugPrint(nullptr), mRXCallbackCount(0), mTXCallbackCount(0) {};
     MAVLinkEndpoint(uint8_t compid, uint8_t sysid, Stream *s):
         mComponentID(compid), mSystemID(sysid), mRXDefaultCallback(nullptr),
         mWriter(nullptr), mInputStream(s), mOutputPrint(nullptr), 
-        mRXCallbackCount(0), mTXCallbackCount(0) {};
+        mDebugPrint(nullptr), mRXCallbackCount(0), mTXCallbackCount(0) {};
     MAVLinkEndpoint(uint8_t compid, uint8_t sysid, Print *p):
         mComponentID(compid), mSystemID(sysid), mRXDefaultCallback(nullptr),
         mWriter(nullptr), mInputStream(nullptr), mOutputPrint(p), 
-        mRXCallbackCount(0), mTXCallbackCount(0) {};
+        mDebugPrint(nullptr), mRXCallbackCount(0), mTXCallbackCount(0) {};
     MAVLinkEndpoint(uint8_t compid, uint8_t sysid, Stream *s, Print *p):
         mComponentID(compid), mSystemID(sysid), mRXDefaultCallback(nullptr),
         mWriter(nullptr), mInputStream(s), mOutputPrint(p), 
-        mRXCallbackCount(0), mTXCallbackCount(0) {};
+        mDebugPrint(nullptr), mRXCallbackCount(0), mTXCallbackCount(0) {};
+    MAVLinkEndpoint(uint8_t compid, uint8_t sysid, Stream *s, Print *p, Print *d):
+        mComponentID(compid), mSystemID(sysid), mRXDefaultCallback(nullptr),
+        mWriter(nullptr), mInputStream(s), mOutputPrint(p), 
+        mDebugPrint(d), mRXCallbackCount(0), mTXCallbackCount(0) {};
     virtual ~MAVLinkEndpoint() {};
     virtual bool registerRXCallback(MAVLinkRXCallback* cb);
     virtual bool registerRXDefaultCallback(MAVLinkRXCallback* cb);
@@ -54,10 +58,12 @@ public:
     virtual bool poll();
     virtual size_t transmit(mavlink_message_t *msg_ptr);
     virtual bool requestMessage(uint8_t msg_src, uint8_t msg_id, uint32_t interval);
-    virtual uint8_t getSystemID() {return mSystemID;};
-    virtual uint8_t getComponentID() {return mComponentID;};
+    virtual uint8_t getSystemID() { return mSystemID; }
+    virtual uint8_t getComponentID() { return mComponentID; }
     virtual void tick();
-    virtual Print* getDebugPrint() {return mDebugPrint;};
+    virtual Print* getDebugPrint() { return mDebugPrint; }
+    virtual Print* getTXPrint() { return mOutputPrint; }
+    virtual Stream* getRXStream() { return mInputStream; }
 private:
     const uint8_t       mComponentID;
     const uint8_t       mSystemID;

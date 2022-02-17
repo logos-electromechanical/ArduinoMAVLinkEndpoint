@@ -309,16 +309,14 @@ unsigned char String::concat(float num)
 {
 	char buf[20];
 	// char* string = dtostrf(num, 4, 2, buf);
-	char* string = "";
-	return concat(string, strlen(string));
+	return concat("", strlen(""));
 }
 
 unsigned char String::concat(double num)
 {
 	char buf[20];
 	// char* string = dtostrf(num, 4, 2, buf);
-	char *string = "";
-    return concat(string, strlen(string));
+    return concat("", strlen(""));
 }
 
 
