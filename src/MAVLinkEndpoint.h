@@ -31,7 +31,7 @@ public:
         mDebugPrint(nullptr), mRXCallbackCount(0), mTXCallbackCount(0) {};
     MAVLinkEndpoint(uint8_t compid, uint8_t sysid, Stream *s):
         mComponentID(compid), mSystemID(sysid), mRXDefaultCallback(nullptr),
-        mWriter(nullptr), mInputStream(s), mOutputPrint(nullptr), 
+        mWriter(nullptr), mInputStream(s), mOutputPrint(s), 
         mDebugPrint(nullptr), mRXCallbackCount(0), mTXCallbackCount(0) {};
     MAVLinkEndpoint(uint8_t compid, uint8_t sysid, Print *p):
         mComponentID(compid), mSystemID(sysid), mRXDefaultCallback(nullptr),

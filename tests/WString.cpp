@@ -27,10 +27,10 @@
 #include "stdlib.h"
 #include "stdio.h"
 #include "WString.h"
-// #include <iostream>
-// #include <cstdio>
 
 using namespace std;
+
+namespace ArduinoMockNamespace {
 
 /*********************************************/
 /*  Constructors                             */
@@ -714,4 +714,6 @@ double String::toDouble(void) const
 {
 	if (buffer) return atof(buffer);
 	return 0;
+}
+
 }
