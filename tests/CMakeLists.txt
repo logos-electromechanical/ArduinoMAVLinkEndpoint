@@ -31,7 +31,10 @@ set (SRCS
     ${SOURCE_HOME_DIR}/transmitters/MAVLinkTXCallback.cpp
     ${SOURCE_HOME_DIR}/params/MAVLinkParamListener.cpp)
 
-add_executable(mavlink_arduino_test mavlink_test.cpp ${SRCS})
+add_executable(mavlink_arduino_test 
+    mavlink_constructor_tests.cpp 
+    # mavlink_process_tests.cpp
+    ${SRCS})
 
 include_directories(AFTER ${SOURCE_HOME_DIR} ${mavlink_arduino_test_SOURCE_DIR})
 

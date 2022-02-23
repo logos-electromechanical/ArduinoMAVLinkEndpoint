@@ -133,7 +133,7 @@ bool MAVLinkEndpoint::requestMessage(uint8_t msg_src, uint8_t msg_id, uint32_t i
          mDebugPrint->print("Requesting message ");
          mDebugPrint->println(msg_id);
      }
-     mavlink_msg_command_long_pack(mComponentID, mSystemID, &msg, mSystemID, 
+     mavlink_msg_command_long_pack(mSystemID, mComponentID, &msg, mSystemID, 
         msg_src, MAV_CMD_SET_MESSAGE_INTERVAL, 0, msg_id, interval, 0, 0, 0, 0, 1);
      return this->transmit(&msg);
 }
