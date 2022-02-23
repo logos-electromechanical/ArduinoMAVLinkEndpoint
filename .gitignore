@@ -36,3 +36,4 @@ CMakeFiles
 *.cmake 
 CMakeCache.txt
 Makefile
+mavlink_arduino_test
