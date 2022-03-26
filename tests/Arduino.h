@@ -4,8 +4,8 @@
 #include "MockStream.h"
 #include "WString.h"
 
-using namespace ArduinoMockNamespace;
+extern uint32_t currentMillis;
 
-static uint32_t currentMillis = 0;
+inline uint32_t millis() { return currentMillis; }
 
-inline uint32_t millis() {return currentMillis;}
+inline void set_millis(uint32_t v) { currentMillis = v; }

@@ -14,8 +14,6 @@
 #endif
 #define BIN 2
 
-namespace ArduinoMockNamespace {
-
 class Print;
 
 using namespace testing;
@@ -128,5 +126,3 @@ public:
     MOCK_METHOD(size_t, println, (), (override));
     MOCK_METHOD(size_t, printTo, (Print &));
 };
-
-}

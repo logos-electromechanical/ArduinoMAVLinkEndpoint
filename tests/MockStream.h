@@ -9,8 +9,6 @@
 
 using namespace std;
 
-namespace ArduinoMockNamespace {
-
 enum LookaheadMode{
     SKIP_ALL,       // All invalid characters are ignored.
     SKIP_NONE,      // Nothing is skipped, and the stream is not touched unless the first waiting character is valid.
@@ -171,5 +169,3 @@ public:
     MOCK_METHOD(size_t, println, (), (override));
     MOCK_METHOD(size_t, printTo, (Print &));
 };
-
-}

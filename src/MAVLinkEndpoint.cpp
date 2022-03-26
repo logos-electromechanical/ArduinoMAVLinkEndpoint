@@ -66,11 +66,12 @@ bool MAVLinkEndpoint::registerDebugPrint(Print *p)
 bool MAVLinkEndpoint::process(uint8_t c)
 {
     bool rcvd = false;
-    if (mavlink_parse_char(MAVLINK_COMM_0, c, &mMessage, &mStatus))
+    if (mavlink_parse_char(mChannel, c, &mMessage, &mStatus))
     {
         if (mDebugPrint) 
         {
-            mDebugPrint->println("Packet received!");
+            mDebugPrint->print("Packet received on endpoint ");
+            mDebugPrint->println(mName);
             mDebugPrint->print("Message type: ");
             mDebugPrint->println(mMessage.msgid);
             mDebugPrint->println(millis());
@@ -88,7 +89,9 @@ bool MAVLinkEndpoint::process(uint8_t c)
     }
     if (mDebugPrint && mStatus.parse_state == 14) 
     {
-        mDebugPrint->print("\nReceived bad CRC ");
+        mDebugPrint->print("\nReceived bad CRC on endpoint ");
+        mDebugPrint->print(mName);
+        mDebugPrint->print(" at ");
         mDebugPrint->println(millis());
     }
     this->tick();

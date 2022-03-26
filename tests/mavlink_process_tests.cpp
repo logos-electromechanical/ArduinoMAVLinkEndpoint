@@ -8,6 +8,7 @@
 #include "receivers/MAVLinkRXCallback.h"
 #include "receivers/MAVLinkDefaultDeactivateRX.h"
 #include "transmitters/MAVLinkTXCallback.h"
+#include "test_utils.h"
 
 #include <random>
 #include <vector>
@@ -15,6 +16,8 @@
 
 using namespace testing;
 using namespace std;
+
+uint32_t currentMillis = 0; // declared here in order to enable millis() and set_millis() to work correctly
 
 // Matcher for incoming message ID
 MATCHER_P(IsMessageID, msg_id, "Check if the arg->msgid == value") {
@@ -24,7 +27,7 @@ MATCHER_P(IsMessageID, msg_id, "Check if the arg->msgid == value") {
 // Values in tuple are sending system id, sending component id, component to send message,
 // requested message id, and desired transmission interval (in milliseconds)
 class MAVLinkEndpointMsgRequestTest : 
-public ::testing::TestWithParam<tuple<uint8_t, uint8_t, uint8_t, uint8_t, uint32_t>> {
+public ::testing::TestWithParam<tuple<uint32_t, uint32_t, uint32_t>> {
 public:
     MAVLinkEndpointMsgRequestTest() {}
     virtual ~MAVLinkEndpointMsgRequestTest() {}
@@ -67,18 +70,21 @@ public:
 TEST_P(MAVLinkEndpointMsgRequestTest, MsgRequestTest)
 {
     MockStream s;
+    uint32_t seed = get<0>(GetParam()) * get<1>(GetParam()) * get<2>(GetParam());
+    vector<uint8_t> data = generateArbitraryIntData<uint8_t>(&seed, 4);
+    uint32_t interval = generateArbitraryIntData<uint32_t>(&seed, 1, 100000)[0];
     EXPECT_CALL(s, write(_)).Times(1);
-    MAVLinkEndpoint mav(get<1>(GetParam()), get<0>(GetParam()), &s);
-    mav.requestMessage(get<2>(GetParam()), get<3>(GetParam()), get<4>(GetParam()));
-    checkRequestMessage(s.write_data, get<0>(GetParam()), get<1>(GetParam()), 
-        get<2>(GetParam()), get<3>(GetParam()), get<4>(GetParam()));
+    MAVLinkEndpoint mav(data[1], data[0], &s);
+    mav.requestMessage(data[2], data[3], interval);
+    checkRequestMessage(s.write_data, data[0], data[1], 
+        data[2], data[3], interval);
 }
 
 // Tuple members are number of receivers to generate,
 // the random seed to use for generating them
 // the maximum interval/timeout range to use
 class MAVLinkEndpointReceiveTickTest :
-public ::testing::TestWithParam<tuple<uint8_t, uint32_t, uint32_t>> 
+public ::testing::TestWithParam<tuple<uint32_t, uint32_t, uint32_t>> 
 {
 public:
     MAVLinkEndpointReceiveTickTest() {}
@@ -86,15 +92,18 @@ public:
 
     void SetUp() 
     {
-        gen = new default_random_engine(get<1>(GetParam()));
-        mav = new MAVLinkEndpoint(0x10, 0x20);
-        for (int i = 0; i < get<0>(GetParam()); i++)
+        seed = get<0>(GetParam()) * get<1>(GetParam()) * get<2>(GetParam());
+        gen = unique_ptr<default_random_engine>(new default_random_engine(seed));
+        mav = unique_ptr<MAVLinkEndpoint>(new MAVLinkEndpoint(0x10, 0x20));
+        std::uniform_int_distribution<uint8_t> countDist(5,30);
+        uint8_t count = countDist(*gen);
+        for (int i = 0; i < count; i++)
         {
-            uinform_int_distribution<uint32_t> timeout_distribution(10,get<2>(GetParam()));
+            std::uniform_int_distribution<uint32_t> timeout_distribution(10, 10000);
             uint32_t timeout = timeout_distribution(*gen);
-            uinform_int_distribution<uint32_t> interval_distribution(0, timeout);
+            std::uniform_int_distribution<uint32_t> interval_distribution(0, timeout);
             uint32_t interval = interval_distribution(*gen);
-            rcvrs.push_back(new MockReceiver(timeout, interval, "", mav.get()));
+            rcvrs.push_back(unique_ptr<MockReceiver>(new MockReceiver(timeout, interval, "", mav.get())));
             mav->registerRXCallback(rcvrs[i].get());
             tick_times[timeout] = rcvrs[i].get();
         }
@@ -104,36 +113,43 @@ public:
     unique_ptr<MAVLinkEndpoint>         mav;
     vector<unique_ptr<MockReceiver>>    rcvrs;
     map<uint32_t, MockReceiver*>        tick_times;
-}
+    uint32_t                            seed;
+};
 
 TEST_P(MAVLinkEndpointReceiveTickTest, TickTimingTest)
 {
-    
     InSequence seq;
-    for (MockReceiver* rx : tick_times) 
+    for (auto rx : tick_times) 
     {
-        EXPECT_CALL(*rx, timeout_action, ());
+        EXPECT_CALL(*(rx.second), timeout_action).Times(AtLeast(1));
     }
-    for (MockReceiver* rx : tick_times) 
+    for (auto rx : tick_times) 
     {
-        set_millis(rx->getTimeout() - 1);
+        set_millis(rx.second->getTimeout() - 1);
         mav->tick();
-        EXPECT_EQ(0, rx->timeout_count);
-        set_millis(rx->getTimeout() + 1);
+        EXPECT_EQ(0, rx.second->timeout_count);
+        set_millis(rx.second->getTimeout() + 1);
         mav->tick();
-        EXPECT_EQ(1, rx->timeout_count);
+        EXPECT_EQ(1, rx.second->timeout_count);
     }
 }
-
 
 INSTANTIATE_TEST_SUITE_P(
     MessageRequestTest,
     MAVLinkEndpointMsgRequestTest,
     ::testing::Combine(
-        ::testing::Values(0, 1, 10, 100, 200, 255),
-        ::testing::Values(0, 1, 10, 100, 200, 255),
-        ::testing::Values(0, 1, 10, 100, 200, 255),
-        ::testing::Values(0, 1, 10, 100, 200, 255),
-        ::testing::Values(0, 100, 1000, 10000, UINT32_MAX)
+        ::testing::Values(13, 17, 19, 23, 29),
+        ::testing::Values(31, 37, 41, 43, 47), 	
+        ::testing::Values(53, 59, 61, 67, 71)
+    )
+);
+
+INSTANTIATE_TEST_SUITE_P(
+    TickMethodTest,
+    MAVLinkEndpointReceiveTickTest,
+    ::testing::Combine(
+        ::testing::Values(13, 17, 19, 23, 29),
+        ::testing::Values(31, 37, 41, 43, 47), 	
+        ::testing::Values(53, 59, 61, 67, 71)
     )
 );

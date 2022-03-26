@@ -30,8 +30,6 @@
 #include <string.h>
 #include <ctype.h>
 
-
-namespace ArduinoMockNamespace {
 // When compiling programs with this class, the following gcc parameters
 // dramatically increase performance and memory (RAM) efficiency, typically
 // with little or no increase in code size.
@@ -214,6 +212,5 @@ public:
 	StringSumHelper(float num) : String(num) {}
 	StringSumHelper(double num) : String(num) {}
 };
-}
 // #endif  // __cplusplus
 #endif  // String_class_h

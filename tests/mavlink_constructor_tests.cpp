@@ -43,7 +43,7 @@ TEST_P(MAVLinkEndpointConstructorTests, TwoArgTest)
     EXPECT_CALL(*p, write(_)).Times(0);
     EXPECT_CALL(s, write(_)).Times(0);
     auto p = GetParam();
-    vector<int16_t> data = generateArbitraryIntData<int16_t>(seed, 2, -20, 300);
+    vector<int16_t> data = generateArbitraryIntData<int16_t>(&seed, 2, -20, 300);
     MAVLinkEndpoint mav(data[0], data[1]);
     if (isBounded<int16_t>(data[0], 0, 255))
     {
@@ -85,7 +85,7 @@ TEST_P(MAVLinkEndpointConstructorTests, RegisterIOTests)
         .WillRepeatedly(Return(msg_size));
     EXPECT_CALL(s, write(_))
         .Times(0);
-    vector<uint8_t> data = generateArbitraryIntData<uint8_t>(seed, 6);
+    vector<uint8_t> data = generateArbitraryIntData<uint8_t>(&seed, 6);
     MAVLinkEndpoint mav(data[0], data[1]);
     EXPECT_EQ(nullptr, mav.getDebugPrint());
     EXPECT_EQ(nullptr, mav.getTXPrint());
@@ -113,7 +113,7 @@ TEST_P(MAVLinkEndpointConstructorTests, ThreeArgsWriter) {
     EXPECT_CALL(*p, write(_))
         .Times(1)
         .WillOnce(Return(msg_size));
-    vector<uint8_t> data = generateArbitraryIntData<uint8_t>(seed, 6);
+    vector<uint8_t> data = generateArbitraryIntData<uint8_t>(&seed, 6);
     MAVLinkEndpoint mav(data[0], data[1], &MAVLinkEndpointConstructorTests::test_writer);
     EXPECT_EQ(mav.getComponentID(), data[0]); 
     EXPECT_EQ(mav.getSystemID(), data[1]); 
@@ -148,7 +148,7 @@ TEST_P(MAVLinkEndpointConstructorTests, ThreeArgsPrint) {
     EXPECT_CALL(*p, write(_))
         .Times(1)
         .WillOnce(Return(msg_size));
-    vector<uint8_t> data = generateArbitraryIntData<uint8_t>(seed, 6);
+    vector<uint8_t> data = generateArbitraryIntData<uint8_t>(&seed, 6);
     MAVLinkEndpoint mav(data[0], data[1], p);
     EXPECT_EQ(mav.getComponentID(), data[0]); 
     EXPECT_EQ(mav.getSystemID(), data[1]); 
@@ -185,7 +185,7 @@ TEST_P(MAVLinkEndpointConstructorTests, ThreeArgsStream) {
         .WillOnce(Return(msg_size));
     EXPECT_CALL(*p, write(_))
         .Times(0);
-    vector<uint8_t> data = generateArbitraryIntData<uint8_t>(seed, 6);
+    vector<uint8_t> data = generateArbitraryIntData<uint8_t>(&seed, 6);
     MAVLinkEndpoint mav(data[0], data[1], &s);
     EXPECT_EQ(mav.getComponentID(), data[0]); 
     EXPECT_EQ(mav.getSystemID(), data[1]);
@@ -228,7 +228,7 @@ TEST_P(MAVLinkEndpointConstructorTests, FourArgs) {
     EXPECT_CALL(*p, write(_))
         .Times(1)
         .WillOnce(Return(msg_size));
-    vector<uint8_t> data = generateArbitraryIntData<uint8_t>(seed, 6);
+    vector<uint8_t> data = generateArbitraryIntData<uint8_t>(&seed, 6);
     MAVLinkEndpoint mav(data[0], data[1], &s, p);
     EXPECT_EQ(mav.getComponentID(), data[0]); 
     EXPECT_EQ(mav.getSystemID(), data[1]);
@@ -263,21 +263,21 @@ TEST_P(MAVLinkEndpointConstructorTests, FourArgs) {
     EXPECT_FALSE(mav.poll());
     for (int i = 0; i < msgbuf_len; i++) { s.stream_data.push(msgbuf[i]); }
     EXPECT_TRUE(mav.poll());
-}
+};
 
 TEST_P(MAVLinkEndpointConstructorTests, FiveArgs) {
     const int msg_size = 21;
     EXPECT_CALL(*p, write(_))
         .Times(1)
         .WillOnce(Return(msg_size));
-    EXPECT_CALL(d, println(Matcher<const char *>(_)))
+    EXPECT_CALL(d, println(Matcher<const String&>(_)))
         .Times(AtLeast(1));
     EXPECT_CALL(d, print(Matcher<const char *>(_)))
         .Times(AtLeast(1));
     EXPECT_CALL(d, println(Matcher<uint32_t>(_),Matcher<int>(_)))
         .Times(AtLeast(1));
     
-    vector<uint8_t> data = generateArbitraryIntData<uint8_t>(seed, 6);
+    vector<uint8_t> data = generateArbitraryIntData<uint8_t>(&seed, 6);
     MAVLinkEndpoint mav(data[0], data[1], &s, p, &d);
     EXPECT_EQ(mav.getComponentID(), data[0]); 
     EXPECT_EQ(mav.getSystemID(), data[1]);
@@ -323,27 +323,3 @@ INSTANTIATE_TEST_SUITE_P(
         ::testing::Values(47, 53, 59, 61, 67, 71, 73)
     ) 
 );
-
-// INSTANTIATE_TEST_SUITE_P(
-//     MAVLinkConstructorsWriterTest,
-//     MAVLinkEndpointWriterConstructorTest,
-//     ::testing::Combine(
-//         #ifdef LONG_TEST
-//         ::testing::Values(0, -1, UINT8_MAX, INT16_MAX, INT16_MIN, 100, 32),
-//         ::testing::Values(0, -1, UINT8_MAX, INT16_MAX, INT16_MIN, 100, 32),
-//         ::testing::Values(0, 255, 1, 32, 2, 10, 100, 200),
-//         ::testing::Values(0, 100, UINT8_MAX),
-//         ::testing::Values(0, 100, UINT8_MAX),
-//         ::testing::Values(0, 1, 100, UINT32_MAX),
-//         ::testing::Values(0, 100, UINT8_MAX)
-//         #else
-//         ::testing::Values(0, -1, 100, 32),
-//         ::testing::Values(0, -1, 100, 32),
-//         ::testing::Values(0, 255),
-//         ::testing::Values(0, UINT8_MAX),
-//         ::testing::Values(0, UINT8_MAX),
-//         ::testing::Values(0, 1, 100),
-//         ::testing::Values(0, UINT8_MAX)
-//         #endif //LONG_TEST
-//     ) 
-// );

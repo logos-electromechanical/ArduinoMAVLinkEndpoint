@@ -15,10 +15,10 @@ public:
         bool result = mTXEndpoint->transmit(msg);
         return result;
     }
-    virtual void timeout(uint64_t t) {};
-    virtual bool isTimeout(uint64_t t) {return false;};
+    virtual void timeout(uint32_t t) {};
+    virtual bool isTimeout(uint32_t t) {return false;};
     virtual String getName() {return mRXName;};
-    virtual uint64_t getLastRX() {return mLastRX;};
+    virtual uint32_t getLastRX() {return mLastRX;};
 private:
     MAVLinkEndpoint *mTXEndpoint;
 };

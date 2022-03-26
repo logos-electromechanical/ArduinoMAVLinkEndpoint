@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Time for flags
 # This flag is required to prevent compiler whining about mavlink
-set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -Wno-address-of-packed-member)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-address-of-packed-member -fsanitize=address")
 
 set(SOURCE_HOME_DIR ${mavlink_arduino_test_SOURCE_DIR}/../src)
 
@@ -33,7 +33,7 @@ set (SRCS
 
 add_executable(mavlink_arduino_test 
     mavlink_constructor_tests.cpp 
-    # mavlink_process_tests.cpp
+    mavlink_process_tests.cpp
     ${SRCS})
 
 include_directories(AFTER ${SOURCE_HOME_DIR} ${mavlink_arduino_test_SOURCE_DIR})

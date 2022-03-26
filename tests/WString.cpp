@@ -30,8 +30,6 @@
 
 using namespace std;
 
-namespace ArduinoMockNamespace {
-
 /*********************************************/
 /*  Constructors                             */
 /*********************************************/
@@ -714,6 +712,4 @@ double String::toDouble(void) const
 {
 	if (buffer) return atof(buffer);
 	return 0;
-}
-
 }
