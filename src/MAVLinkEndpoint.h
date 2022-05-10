@@ -2,7 +2,7 @@
 
 #include <cstring>
 #include "Arduino.h"
-#include "mavlink/ardupilotmega/mavlink.h"
+#include "mavlink/ladon_robotics/mavlink.h"
 #include "receivers/MAVLinkRXCallback.h"
 #include "transmitters/MAVLinkTXCallback.h"
 
