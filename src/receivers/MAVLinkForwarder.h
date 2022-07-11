@@ -19,6 +19,7 @@ public:
         if ((mAllowList == nullptr) || (std::find(mAllowList->begin(), mAllowList->end(), msg->msgid) != mAllowList->end()))
         {
             bool result = mTXEndpoint->transmit(msg);
+            // if (mReportEndpoint || mTXEndpoint->getDebugPrint() || mRXEndpoint->getDebugPrint()) 
             if (mReportEndpoint) 
             {
                 mavlink_message_t repmsg;
@@ -29,6 +30,8 @@ public:
                 mavlink_msg_statustext_pack(
                     mRXEndpoint->getSystemID(), mReportEndpoint->getComponentID(), &repmsg,
                     7, msgbuf, 0, 0);
+                // if (mTXEndpoint->getDebugPrint()) mTXEndpoint->getDebugPrint()->println(msgbuf);
+                // if (mRXEndpoint->getDebugPrint()) mRXEndpoint->getDebugPrint()->println(msgbuf);
                 mReportEndpoint->transmit(&repmsg);
             }
             mLastRX = millis();

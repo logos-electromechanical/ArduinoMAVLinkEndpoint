@@ -57,7 +57,7 @@ public:
     virtual bool process(uint8_t c);
     virtual bool poll();
     virtual size_t transmit(mavlink_message_t *msg_ptr);
-    virtual bool requestMessage(uint8_t msg_src, uint8_t msg_id, uint32_t interval);
+    virtual bool requestMessage(uint8_t msg_src, uint32_t msg_id, uint32_t interval);
     virtual uint8_t getSystemID() { return mSystemID; }
     virtual uint8_t getComponentID() { return mComponentID; }
     virtual void tick();

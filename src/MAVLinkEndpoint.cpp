@@ -66,14 +66,16 @@ bool MAVLinkEndpoint::registerDebugPrint(Print *p)
 bool MAVLinkEndpoint::process(uint8_t c)
 {
     bool rcvd = false;
+    if (mDebugPrint) mDebugPrint->print(c, HEX);
     if (mavlink_parse_char(mChannel, c, &mMessage, &mStatus))
     {
         if (mDebugPrint) 
         {
             mDebugPrint->print("Packet received on endpoint ");
-            mDebugPrint->println(mName);
-            mDebugPrint->print("Message type: ");
-            mDebugPrint->println(mMessage.msgid);
+            mDebugPrint->print(mName);
+            mDebugPrint->print(" Message type: ");
+            mDebugPrint->print(mMessage.msgid);
+            mDebugPrint->print(" ");
             mDebugPrint->println(millis());
         }
         bool result = false;
@@ -128,7 +130,7 @@ size_t MAVLinkEndpoint::transmit(mavlink_message_t *msg_ptr)
     }
 }
 
-bool MAVLinkEndpoint::requestMessage(uint8_t msg_src, uint8_t msg_id, uint32_t interval)
+bool MAVLinkEndpoint::requestMessage(uint8_t msg_src, uint32_t msg_id, uint32_t interval)
 {
      mavlink_message_t msg;
      if (mDebugPrint) 
@@ -161,6 +163,9 @@ bool MAVLinkEndpoint::poll()
     bool rcvd = false;
     while (mInputStream->available())       // While there are bytes available in the input stream...
     {
+        // if (mDebugPrint) mDebugPrint->print(millis());
+        // if (mDebugPrint) mDebugPrint->print(" ");
+        // if (mDebugPrint) mDebugPrint->println(mInputStream->available());
         uint8_t c = mInputStream->read();   // Read in a byte
         rcvd |= process(c);                 // process the byte and if there's a packet, set the return value true
     }
