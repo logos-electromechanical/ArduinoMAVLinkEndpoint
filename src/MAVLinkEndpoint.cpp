@@ -66,7 +66,6 @@ bool MAVLinkEndpoint::registerDebugPrint(Print *p)
 bool MAVLinkEndpoint::process(uint8_t c)
 {
     bool rcvd = false;
-    if (mDebugPrint) mDebugPrint->print(c, HEX);
     if (mavlink_parse_char(mChannel, c, &mMessage, &mStatus))
     {
         if (mDebugPrint) 
@@ -166,8 +165,16 @@ bool MAVLinkEndpoint::poll()
         // if (mDebugPrint) mDebugPrint->print(millis());
         // if (mDebugPrint) mDebugPrint->print(" ");
         // if (mDebugPrint) mDebugPrint->println(mInputStream->available());
-        uint8_t c = mInputStream->read();   // Read in a byte
-        rcvd |= process(c);                 // process the byte and if there's a packet, set the return value true
+        uint16_t in = mInputStream->read();   // Read in a byte 
+        // check if we really got a byte...
+        if (in > -1) 
+        {
+            uint8_t c = in;
+            // if (mDebugPrint) mDebugPrint->print(" 0x");
+            // if (mDebugPrint) mDebugPrint->print(c, HEX);
+            // if (mDebugPrint && (c == '\n')) mDebugPrint->println("\nFound line end"); 
+            rcvd |= process(c);                 // process the byte and if there's a packet, set the return value true
+        }
     }
     return rcvd;
 }
